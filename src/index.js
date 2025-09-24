@@ -1,9 +1,24 @@
-const search = (documents, searchWord) => {
-    const regex = new RegExp(`\\b${searchWord}\\b`, "i");
+const search = (documents, searchPattern) => {
+    const wordsArray = searchPattern.split(" ");
 
-    const filteredDocuments = documents.filter((doc) => regex.test(doc.text));
+    // const regex = new RegExp(`\\b${searchPattern}\\b`, "i");
+    
+    const searchedDocuments = documents
+        .filter((doc) => {
+            return wordsArray.some((word) => (new RegExp(`\\b${word}\\b`, "i").test(doc.text)));
+        })
+        .map((doc) => {
+            const countMatches = wordsArray.reduce((counter, word) => {
+                const matches = doc.text.match(new RegExp(`\\b${word}\\b`, "gi")) || [];
+                return counter + matches.length;
+            }, 0);
 
-    return filteredDocuments.map((doc) => doc.id);
+        return { doc, countMatches};
+        })
+        .sort((a, b) => b.countMatches - a.countMatches)
+        .map((item) => item.doc.id);
+
+    return searchedDocuments;
 };
 
 export default search;

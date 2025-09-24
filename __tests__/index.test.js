@@ -7,11 +7,6 @@ describe('search', () => {
   const doc3 = { id: 'doc3', text: "I'm your shooter." };
   const docs = [doc1, doc2, doc3];
 
-  test('finds documents containing the word "shoot"', () => {
-    const result = search(docs, 'shoot');
-    expect(result).toEqual(['doc1', 'doc2']);
-  });
-
   test('returns empty array when no documents match', () => {
     const result = search(docs, 'banana');
     expect(result).toEqual([]);
@@ -24,7 +19,7 @@ describe('search', () => {
 
   test('search is case insensitive', () => {
     const result = search(docs, 'Shoot');
-    expect(result).toEqual(['doc1', 'doc2']);
+    expect(result).toEqual(['doc2', 'doc1']);
   });
 
   test('matches whole words only (not substrings)', () => {
@@ -35,5 +30,15 @@ describe('search', () => {
   test('ignores punctuation around words', () => {
     const result = search(docs, 'pint');
     expect(result).toEqual(['doc1']);
+  });
+
+  test('ranks more relevant documents higher', () => {
+    const result = search(docs, 'shoot');
+    expect(result).toEqual(['doc2', 'doc1']);
+  });
+
+  test('evaluates pattern with multiple words', () => {
+    const result = search(docs, 'shoot at me');
+    expect(result).toEqual(['doc2', 'doc1']);
   });
 });
