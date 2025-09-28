@@ -21,7 +21,7 @@ const search = (documents, searchPattern) => {
   const results = {};
 
   wordsArray.forEach((word) => {
-    indexes[word].map((docId) => {
+    indexes[word].forEach((docId) => {
       const idf = documents.length / 1 + indexes[word].length;
 
       const document = documents.find((doc) => doc.id === docId);
