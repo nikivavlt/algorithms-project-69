@@ -13,11 +13,11 @@ export default defineConfig([
     plugins: { js },
     extends: ['js/recommended'],
     rules: {
-      indent: ['error', 2],              // 2 spaces
-      semi: ['error', 'always'],         // require semicolons
-      quotes: ['error', 'single'],       // single quotes
-      'no-trailing-spaces': 'error',     // no trailing spaces
-      'eol-last': ['error', 'always'],   // newline at EOF
+      indent: ['error', 2],
+      semi: ['error', 'always'],
+      quotes: ['error', 'single'],
+      'no-trailing-spaces': 'error',
+      'eol-last': ['error', 'always'],
     },
   },
 ]);
