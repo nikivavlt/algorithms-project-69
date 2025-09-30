@@ -1,35 +1,32 @@
+
 const search = (documents, searchPattern) => {
   const wordsArray = searchPattern.split(' ');
+  const documentsMap = new Map(documents.map(doc => [doc.id, doc]));
 
-  const indexes = wordsArray.reduce((acc, word) => {
-    const filteredDocuments = [];
+  const indexes = {};
+  wordsArray.forEach((word) => {
+    const regex = new RegExp(`\\b${word}\\b`, 'i');
 
-    documents.forEach((doc) => {
-      if ((new RegExp(`\\b${word}\\b`, 'i').test(doc.text))) {
-        const matches = doc.text.match(new RegExp(`\\b${word}\\b`, 'gi')) || [];
-        filteredDocuments.push({ doc, countMatches: matches.length });
-      }
-    });
-
-    filteredDocuments.sort((a, b) => b.countMatches - a.countMatches);
-
-    const finalResult = filteredDocuments.map((item) => item.doc.id);
-    acc[word] = finalResult;
-    return acc;
-  }, {});
+    indexes[word] = documents
+      .filter((doc) => {
+        return (regex.test(doc.text));
+      })
+      .map((doc) => doc.id);
+  });
 
   const results = {};
 
   wordsArray.forEach((word) => {
+    const regex = new RegExp(`\\b${word}\\b`, 'gi');
+
     indexes[word].forEach((docId) => {
-      const idf = documents.length / 1 + indexes[word].length;
+      const document = documentsMap.get(docId);
 
-      const document = documents.find((doc) => doc.id === docId);
+      const matches = document.text.match(regex) || [];
+      const totalWords = document.text.match(/\w+/g)?.length || 0;
 
-      const matches = document.text.match(new RegExp(`\\b${word}\\b`, 'gi')) || [];
-
-      const tf = matches.length / document.text.split(' ').length;
-
+      const idf = Math.log(1 + documents.length / (1 + indexes[word].length));
+      const tf = matches.length / totalWords;
       const score = tf * idf;
 
       if (results[docId]) {
@@ -40,28 +37,11 @@ const search = (documents, searchPattern) => {
     });
   });
 
-  const finalResult = Object.entries(results).sort((a, b) => b[1] - a[1]).map((item) => item[0]);
-  // console.log({ finalResult });
+  const finalResult = Object.entries(results)
+    .sort((a, b) => b[1] - a[1])
+    .map((item) => item[0]);
+
   return finalResult;
-
-  // const regex = new RegExp(`\\b${searchPattern}\\b`, "i");
-
-  // const searchedDocuments = documents
-  //     .filter((doc) => {
-  //         return wordsArray.some((word) => (new RegExp(`\\b${word}\\b`, "i").test(doc.text)));
-  //     })
-  //     .map((doc) => {
-  //         const countMatches = wordsArray.reduce((counter, word) => {
-  //             const matches = doc.text.match(new RegExp(`\\b${word}\\b`, "gi")) || [];
-  //             return counter + matches.length;
-  //         }, 0);
-
-  //     return { doc, countMatches};
-  //     })
-  //     .sort((a, b) => b.countMatches - a.countMatches)
-  //     .map((item) => item.doc.id);
-
-  // return searchedDocuments;
 };
 
 export default search;
