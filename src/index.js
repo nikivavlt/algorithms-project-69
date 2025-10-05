@@ -7,7 +7,7 @@ const search = (documents, searchPattern) => {
     const regex = new RegExp(`\\b${word}\\b`, 'i');
 
     indexes[word] = documents
-      .filter((doc) =>  (regex.test(doc.text)))
+      .filter((doc) => (regex.test(doc.text)))
       .map((doc) => doc.id);
   });
 
